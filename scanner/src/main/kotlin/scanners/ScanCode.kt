@@ -337,7 +337,7 @@ class ScanCode(
 
         with(process) {
             if (isSuccess || hasOnlyMemoryErrors || hasOnlyTimeoutErrors) {
-                return ScanResult(Provenance(), getDetails(), summary.copy(errors = errors), result)
+                return ScanResult(Provenance(), getDetails(), summary.copy(errors = errors), getLicenseFiles(path), result)
             } else {
                 throw ScanException(errorMessage)
             }

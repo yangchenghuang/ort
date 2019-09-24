@@ -139,7 +139,7 @@ class BoyterLc(name: String, config: ScannerConfiguration) : LocalScanner(name, 
             if (isSuccess) {
                 val result = getRawResult(resultsFile)
                 val summary = generateSummary(startTime, endTime, path, result)
-                return ScanResult(Provenance(), getDetails(), summary, result)
+                return ScanResult(Provenance(), getDetails(), summary, getLicenseFiles(path), result)
             } else {
                 throw ScanException(errorMessage)
             }

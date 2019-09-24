@@ -40,6 +40,7 @@ import com.here.ort.model.ScannerDetails
 import com.here.ort.model.ScannerRun
 import com.here.ort.model.config.ScannerConfiguration
 import com.here.ort.model.mapper
+import com.here.ort.spdx.LicenseFileMatcher
 import com.here.ort.utils.CommandLineTool
 import com.here.ort.utils.NamedThreadFactory
 import com.here.ort.utils.Os
@@ -213,6 +214,7 @@ abstract class LocalScanner(name: String, config: ScannerConfiguration) : Scanne
                                             )
                                         )
                                     ),
+                                    licenseFiles = emptyMap(),
                                     rawResult = EMPTY_JSON_NODE
                                 )
                             )
@@ -288,6 +290,7 @@ abstract class LocalScanner(name: String, config: ScannerConfiguration) : Scanne
                     copyrightFindings = sortedSetOf(),
                     errors = listOf(OrtIssue(source = scannerName, message = e.collectMessagesAsString()))
                 ),
+                emptyMap(),
                 EMPTY_JSON_NODE
             )
         }
@@ -351,7 +354,7 @@ abstract class LocalScanner(name: String, config: ScannerConfiguration) : Scanne
                 copyrightFindings = sortedSetOf(),
                 errors = listOf(OrtIssue(source = scannerName, message = e.collectMessagesAsString()))
             )
-            ScanResult(Provenance(), getDetails(), summary)
+            ScanResult(Provenance(), getDetails(), summary, emptyMap())
         }
 
         // There is no package id for arbitrary paths so create a fake one, ensuring that no ":" is contained.
@@ -403,5 +406,11 @@ abstract class LocalScanner(name: String, config: ScannerConfiguration) : Scanne
         }
 
         return relativePathToScannedFile.invariantSeparatorsPath
+    }
+
+    protected fun getLicenseFiles(path: File): Map<String, String> {
+        return path.walkBottomUp()
+            .filter { LicenseFileMatcher.DEFAULT_MATCHER.matches(it.name) }
+            .associate { Pair(relativizePath(path, it), it.readText()) }
     }
 }

@@ -45,6 +45,11 @@ data class ScanResult(
     val summary: ScanSummary,
 
     /**
+     * A mapping of license files from path to content.
+     */
+    val licenseFiles: Map<String, String>,
+
+    /**
      * The raw output of the scanner. Can be null if the raw result shall not be included. If the raw result is
      * empty it must not be null but [EMPTY_JSON_NODE].
      */
@@ -76,6 +81,6 @@ data class ScanResult(
             copyrightFindings = copyrightFindings
         )
 
-        return ScanResult(newProvenance, scanner, summary)
+        return ScanResult(newProvenance, scanner, summary, licenseFiles)
     }
 }
