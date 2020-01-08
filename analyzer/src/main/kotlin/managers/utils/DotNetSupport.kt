@@ -87,6 +87,35 @@ fun PackageManager.resolveDotNetDependencies(
 }
 
 class DotNetSupport(packageReferences: Set<Identifier>) {
+    val packages = mutableListOf<Package>()
+    val errors = mutableListOf<OrtIssue>()
+    val scope = Scope("dependencies", sortedSetOf())
+
+    init {
+        packageReferencesMap.forEach { (name, version) ->
+            getPackageInfo(name, version)
+        }
+    }
+
+    fun getPackageInfo(name: String, version: String): String {
+        val request = Request.Builder()
+            .get()
+            .url("https://api.nuget.org/v3/registration3/${name.toLowerCase()}/$version.json")
+            .build()
+
+        OkHttpClientHelper.execute(HTTP_CACHE_PATH, request).use { response ->
+            val body = response.body?.string()?.trim()
+
+            if (response.code != HttpURLConnection.HTTP_OK || body.isNullOrEmpty()) {
+                throw IOException("Unable to get information for package $name version $version.")
+            }
+
+            return body
+        }
+    }
+}
+
+class DotNetSupport2(packageReferencesMap: Map<String, String>) {
     companion object {
         private const val PROVIDER_NAME = "nuget"
 
