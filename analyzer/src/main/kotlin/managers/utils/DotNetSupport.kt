@@ -54,7 +54,7 @@ import java.net.HttpURLConnection
 abstract class XmlPackageReferenceMapper {
     protected val mapper = XmlMapper().registerKotlinModule()
 
-    abstract fun mapPackageReferences(definitionFile: File): Map<String, String>
+    abstract fun mapPackageReferences(definitionFile: File): Set<Identifier>
 }
 
 fun PackageManager.resolveDotNetDependencies(
@@ -86,7 +86,7 @@ fun PackageManager.resolveDotNetDependencies(
     )
 }
 
-class DotNetSupport(packageReferencesMap: Map<String, String>) {
+class DotNetSupport(packageReferences: Set<Identifier>) {
     companion object {
         private const val PROVIDER_NAME = "nuget"
 
@@ -159,8 +159,8 @@ class DotNetSupport(packageReferencesMap: Map<String, String>) {
     private val packageReferencesAlreadyFound = mutableMapOf<Pair<String, String>, Pair<String, JsonNode>>()
 
     init {
-        packageReferencesMap.forEach { (name, version) ->
-            val scopeDependency = getPackageReferenceFromRestAPI(name, version)
+        packageReferences.forEach { id ->
+            val scopeDependency = getPackageReferenceFromRestAPI(id.name, id.version)
             scopeDependency?.let { scope.dependencies += it }
         }
 

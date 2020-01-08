@@ -30,6 +30,7 @@ import com.here.ort.analyzer.AbstractPackageManagerFactory
 import com.here.ort.analyzer.PackageManager
 import com.here.ort.analyzer.managers.utils.XmlPackageReferenceMapper
 import com.here.ort.analyzer.managers.utils.resolveDotNetDependencies
+import com.here.ort.model.Identifier
 import com.here.ort.model.ProjectAnalyzerResult
 import com.here.ort.model.config.AnalyzerConfiguration
 import com.here.ort.model.config.RepositoryConfiguration
@@ -53,15 +54,15 @@ class NuGetPackageReferenceMapper : XmlPackageReferenceMapper() {
         val version: String
     )
 
-    override fun mapPackageReferences(definitionFile: File): Map<String, String> {
-        val map = mutableMapOf<String, String>()
+    override fun mapPackageReferences(definitionFile: File): Set<Identifier> {
+        val ids = mutableSetOf<Identifier>()
         val packagesConfig = mapper.readValue<PackagesConfig>(definitionFile)
 
         packagesConfig.packages.forEach {
-            map[it.id] = it.version
+            ids += Identifier(type = "", namespace = "", name = it.id, version = it.version)
         }
 
-        return map
+        return ids
     }
 }
 
