@@ -45,8 +45,8 @@ class NuGetTest : StringSpec() {
 
     init {
         "Definition file is correctly mapped" {
-            val mapper = NuGetPackageReferenceMapper()
-            val result = mapper.mapPackageReferences(packageFile)
+            val reader = NuGetPackageFileReader()
+            val result = reader.getPackageReferences(packageFile)
 
             result.size shouldBe 2
         }

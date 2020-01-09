@@ -51,18 +51,18 @@ import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
 
-abstract class XmlPackageReferenceMapper {
+abstract class XmlPackageFileReader {
     protected val mapper = XmlMapper().registerKotlinModule()
 
-    abstract fun mapPackageReferences(definitionFile: File): Set<Identifier>
+    abstract fun getPackageReferences(definitionFile: File): Set<Identifier>
 }
 
 fun PackageManager.resolveDotNetDependencies(
     definitionFile: File,
-    mapper: XmlPackageReferenceMapper
+    mapper: XmlPackageFileReader
 ): ProjectAnalyzerResult? {
     val workingDir = definitionFile.parentFile
-    val support = DotNetSupport(mapper.mapPackageReferences(definitionFile))
+    val support = DotNetSupport(mapper.getPackageReferences(definitionFile))
 
     val project = Project(
         id = Identifier(

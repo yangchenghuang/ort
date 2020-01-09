@@ -28,7 +28,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 
 import com.here.ort.analyzer.AbstractPackageManagerFactory
 import com.here.ort.analyzer.PackageManager
-import com.here.ort.analyzer.managers.utils.XmlPackageReferenceMapper
+import com.here.ort.analyzer.managers.utils.XmlPackageFileReader
 import com.here.ort.analyzer.managers.utils.resolveDotNetDependencies
 import com.here.ort.model.Identifier
 import com.here.ort.model.ProjectAnalyzerResult
@@ -37,7 +37,7 @@ import com.here.ort.model.config.RepositoryConfiguration
 
 import java.io.File
 
-class DotNetPackageReferenceMapper : XmlPackageReferenceMapper() {
+class DotNetPackageFileReader : XmlPackageFileReader() {
     // See https://docs.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files.
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class ItemGroup(
@@ -54,7 +54,7 @@ class DotNetPackageReferenceMapper : XmlPackageReferenceMapper() {
         val version: String
     )
 
-    override fun mapPackageReferences(definitionFile: File): Set<Identifier> {
+    override fun getPackageReferences(definitionFile: File): Set<Identifier> {
         val ids = mutableSetOf<Identifier>()
         val itemGroups = mapper.readValue<List<ItemGroup>>(definitionFile)
 
@@ -88,5 +88,5 @@ class DotNet(
     }
 
     override fun resolveDependencies(definitionFile: File): ProjectAnalyzerResult? =
-        resolveDotNetDependencies(definitionFile, DotNetPackageReferenceMapper())
+        resolveDotNetDependencies(definitionFile, DotNetPackageFileReader())
 }
