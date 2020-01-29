@@ -29,18 +29,36 @@ import com.here.ort.utils.log
 import com.here.ort.utils.safeMkdirs
 import com.here.ort.utils.showStackTrace
 
+import com.jcraft.jsch.Session
+
 import java.io.File
 import java.io.IOException
 
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.LsRemoteCommand
 import org.eclipse.jgit.api.errors.GitAPIException
+import org.eclipse.jgit.transport.JschConfigSessionFactory
+import org.eclipse.jgit.transport.OpenSshConfig
+import org.eclipse.jgit.transport.SshSessionFactory
 import org.eclipse.jgit.transport.URIish
 
 // TODO: Make this configurable.
 const val GIT_HISTORY_DEPTH = 50
 
 class Git : GitBase() {
+    companion object {
+        init {
+            // Configure JGit to connect to the SSH-Agent if it is available.
+            val sessionFactory = object : JschConfigSessionFactory() {
+                override fun configure(hc: OpenSshConfig.Host, session: Session) {
+                    session.setConfig("StrictHostKeyChecking", "no")
+                }
+            }
+
+            SshSessionFactory.setInstance(sessionFactory)
+        }
+    }
+
     override val type = VcsType.GIT
     override val priority = 100
 
