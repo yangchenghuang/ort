@@ -52,6 +52,18 @@ import org.eclipse.jgit.util.FS
 // TODO: Make this configurable.
 const val GIT_HISTORY_DEPTH = 50
 
+fun main() {
+    val vcsInfo = VcsInfo(
+        type = VcsType.GIT,
+        url = "git@github.com:heremaps/oss-review-toolkit.git",
+        revision = "master"
+    )
+    val dir = File("/tmp/git")
+    val git = Git()
+    val workingTree = git.initWorkingTree(dir, vcsInfo)
+    workingTree.listRemoteBranches()
+}
+
 class Git : GitBase() {
     companion object {
         init {
@@ -61,8 +73,21 @@ class Git : GitBase() {
                 override fun createDefaultJSch(fs: FS): JSch {
                     val jSch = super.createDefaultJSch(fs)
 
+                    println("FS.userHome = ${fs.userHome().absolutePath}")
+
                     // Read the OpenSSH configuration file.
                     jSch.configRepository = OpenSSHConfig.parseFile("~/.ssh/config")
+
+                    val hostKeyRepository = jSch.hostKeyRepository
+                    println("knownHostsRepositoryID = ${hostKeyRepository.knownHostsRepositoryID}")
+                    hostKeyRepository.hostKey.forEach { hostKey ->
+                        println("Host   : ${hostKey.host}")
+                        println("Comment: ${hostKey.comment}")
+                        println("Key    : ${hostKey.key}")
+                        println("Marker : ${hostKey.marker}")
+                        println("Type   : ${hostKey.type}")
+                        println("--------")
+                    }
 
                     // Connect to the SSH-Agent if it is available.
                     try {
