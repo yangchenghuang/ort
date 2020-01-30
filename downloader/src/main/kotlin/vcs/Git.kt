@@ -56,9 +56,7 @@ class Git : GitBase() {
     companion object {
         init {
             val sessionFactory = object : JschConfigSessionFactory() {
-                override fun configure(hc: OpenSshConfig.Host, session: Session) {
-                    session.setConfig("StrictHostKeyChecking", "no")
-                }
+                override fun configure(hc: OpenSshConfig.Host, session: Session) {}
 
                 override fun createDefaultJSch(fs: FS): JSch {
                     val jSch = super.createDefaultJSch(fs)
