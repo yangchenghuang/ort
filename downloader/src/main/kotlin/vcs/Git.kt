@@ -30,6 +30,7 @@ import com.here.ort.utils.safeMkdirs
 import com.here.ort.utils.showStackTrace
 
 import com.jcraft.jsch.JSch
+import com.jcraft.jsch.OpenSSHConfig
 import com.jcraft.jsch.Session
 import com.jcraft.jsch.agentproxy.AgentProxyException
 import com.jcraft.jsch.agentproxy.RemoteIdentityRepository
@@ -54,7 +55,6 @@ const val GIT_HISTORY_DEPTH = 50
 class Git : GitBase() {
     companion object {
         init {
-            // Configure JGit to connect to the SSH-Agent if it is available.
             val sessionFactory = object : JschConfigSessionFactory() {
                 override fun configure(hc: OpenSshConfig.Host, session: Session) {
                     session.setConfig("StrictHostKeyChecking", "no")
@@ -63,6 +63,10 @@ class Git : GitBase() {
                 override fun createDefaultJSch(fs: FS): JSch {
                     val jSch = super.createDefaultJSch(fs)
 
+                    // Read the OpenSSH configuration file.
+                    jSch.configRepository = OpenSSHConfig.parseFile("~/.ssh/config")
+
+                    // Connect to the SSH-Agent if it is available.
                     try {
                         if (SSHAgentConnector.isConnectorAvailable()) {
                             val socketFactory = JNAUSocketFactory()
