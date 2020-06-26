@@ -100,6 +100,8 @@ RUN apt-get update && \
         python3-pip=$PYTHON_PIP_VERSION \
         python3-setuptools \
         sbt=$SBT_VERSION \
+        # Install fonts required by AntennaAttributionDocumentReporter.
+        ttf-mscorefonts-installer \
     && \
     rm -rf /var/lib/apt/lists/*
 
